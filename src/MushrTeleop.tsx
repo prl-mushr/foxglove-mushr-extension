@@ -36,6 +36,10 @@ function MushrTeleop({ context }: { context: PanelExtensionContext }): JSX.Eleme
 
   const [renderDone, setRenderDone] = useState<(() => void) | undefined>();
 
+  const [poseStyle, setPoseStyle] = useState<Object>({...teleopStyles.button, ...teleopStyles.selected});
+  const [goalStyle, setGoalStyle] = useState<Object>({...teleopStyles.button});
+  const [estimateStyle, setEstimateStyle] = useState<Object>({...teleopStyles.button});
+
   useLayoutEffect(() => {
    
     context.onRender = (renderState: RenderState, done) => {
@@ -81,6 +85,19 @@ function MushrTeleop({ context }: { context: PanelExtensionContext }): JSX.Eleme
   const canPublish = context.publish != undefined;
   function setMessageValue(value: string) {
     message.data = value;
+    if (value === "pose") {
+      setPoseStyle({...teleopStyles.button, ...teleopStyles.selected});
+      setGoalStyle({...teleopStyles.button});
+      setEstimateStyle({...teleopStyles.button});
+    } else if (value === "goal") {
+      setPoseStyle({...teleopStyles.button});
+      setGoalStyle({...teleopStyles.button, ...teleopStyles.selected});
+      setEstimateStyle({...teleopStyles.button});
+    } else if (value === "estimate") {
+      setPoseStyle({...teleopStyles.button});
+      setGoalStyle({...teleopStyles.button});
+      setEstimateStyle({...teleopStyles.button, ...teleopStyles.selected});
+    }
   }
   return (
     <>
@@ -97,7 +114,7 @@ function MushrTeleop({ context }: { context: PanelExtensionContext }): JSX.Eleme
         {canPublish &&
           (<div style={teleopStyles.box}>
             <button 
-              style={{...teleopStyles.button, ...(message.data === "pose" ? teleopStyles.selected : {})}}
+              style={poseStyle}
               onClick={() => {
                 setMessageValue("pose");
               }}
@@ -105,14 +122,14 @@ function MushrTeleop({ context }: { context: PanelExtensionContext }): JSX.Eleme
                 Set Pose
             </button>
             <button 
-              style={{...teleopStyles.button, ...(message.data === "estimate" ? teleopStyles.selected : {})}}
+              style={estimateStyle}
               onClick={() => {
                 setMessageValue("estimate");
               }}
             >
               Set Pose Estimate</button>
             <button 
-              style={{...teleopStyles.button, ...(message.data === "goal" ? teleopStyles.selected : {})}}
+              style={goalStyle}
               onClick={() => {
                 setMessageValue("goal");
               }}
